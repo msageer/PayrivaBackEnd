@@ -1,56 +1,75 @@
 const express = require('express');
+const axios = require('axios');
 const cors = require('cors');
-const { TonClient } = require('@tonclient/core');
-const { libNode } = require('@tonclient/lib-node');
-
-// Register TON client
-TonClient.useBinaryLibrary(libNode);
+const bodyParser = require('body-parser');
 
 const app = express();
-app.use(cors()); // Allow cross-origin requests from your GitHub Pages
-app.use(express.json());
+const port = 3000;
 
-// Initialize TON client
-const client = new TonClient({
-  network: {
-    server_address: 'https://net.ton.dev'
-  }
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
+
+// Mock database (replace with a real database in production)
+let users = {};
+let transactions = [];
+let adminCredentials = { username: 'admin', password: 'password123' }; // Replace with secure credentials
+let services = {
+    dataBundles: {
+        mtn: [
+            { name: "500MB - 30 Days", price: 300, value: "500MB" },
+            { name: "1GB - 30 Days", price: 500, value: "1GB" },
+            { name: "3GB - 30 Days", price: 1200, value: "3GB" }
+        ],
+        airtel: [],
+        glo: [],
+        "9mobile": []
+    },
+    tvPackages: {
+        dstv: [],
+        gotv: [],
+        startimes: []
+    }
+};
+
+// Admin login endpoint
+app.post('/admin/login', (req, res) => {
+    const { username, password } = req.body;
+
+    if (username === adminCredentials.username && password === adminCredentials.password) {
+        res.json({ success: true, message: 'Login successful' });
+    } else {
+        res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
 });
 
-// Endpoint to handle wallet connection
-app.post('/api/connect-wallet', async (req, res) => {
-  const { walletAddress } = req.body;
-  
-  try {
-    // Validate the wallet address
-    // Store user's wallet info in your database
-    
-    res.json({ success: true, address: walletAddress });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
+// Fetch all services
+app.get('/admin/services', (req, res) => {
+    res.json(services);
 });
 
-// Endpoint to process deposits
-app.post('/api/deposit', async (req, res) => {
-  const { walletAddress, amount, currency } = req.body;
-  
-  try {
-    // Process the deposit using TON SDK
-    // Verify the transaction
-    // Update user balance
-    
-    res.json({ 
-      success: true, 
-      message: `Deposited ${amount} ${currency}`,
-      balance: updatedBalance 
-    });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
+// Update service packages
+app.post('/admin/services/update', (req, res) => {
+    const { serviceType, provider, packages } = req.body;
+
+    if (!serviceType || !provider || !Array.isArray(packages)) {
+        return res.status(400).json({ error: 'Invalid request data' });
+    }
+
+    if (!services[serviceType]) {
+        return res.status(400).json({ error: 'Invalid service type' });
+    }
+
+    services[serviceType][provider] = packages;
+    res.json({ success: true, message: 'Service packages updated successfully' });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// Fetch all transactions (for monitoring)
+app.get('/admin/transactions', (req, res) => {
+    res.json(transactions);
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
 });
