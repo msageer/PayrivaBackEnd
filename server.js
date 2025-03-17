@@ -21,14 +21,41 @@ let services = {
             { name: "1GB - 30 Days", price: 500, value: "1GB" },
             { name: "3GB - 30 Days", price: 1200, value: "3GB" }
         ],
-        airtel: [],
-        glo: [],
-        "9mobile": []
+        airtel: [
+            { name: "500MB - 30 Days", price: 300, value: "500MB" },
+            { name: "1GB - 30 Days", price: 500, value: "1GB" },
+            { name: "3GB - 30 Days", price: 1200, value: "3GB" }
+        ],
+        glo: [
+            { name: "500MB - 30 Days", price: 300, value: "500MB" },
+            { name: "1GB - 30 Days", price: 500, value: "1GB" },
+            { name: "3GB - 30 Days", price: 1200, value: "3GB" }
+        ],
+        "9mobile": [
+            { name: "500MB - 30 Days", price: 300, value: "500MB" },
+            { name: "1GB - 30 Days", price: 500, value: "1GB" },
+            { name: "3GB - 30 Days", price: 1200, value: "3GB" }
+        ]
     },
     tvPackages: {
-        dstv: [],
-        gotv: [],
-        startimes: []
+        dstv: [
+            { name: "Access", price: 2000, value: "access" },
+            { name: "Family", price: 4000, value: "family" },
+            { name: "Compact", price: 7900, value: "compact" },
+            { name: "Premium", price: 18400, value: "premium" }
+        ],
+        gotv: [
+            { name: "GOtv Lite", price: 900, value: "lite" },
+            { name: "GOtv Value", price: 1800, value: "value" },
+            { name: "GOtv Plus", price: 3300, value: "plus" },
+            { name: "GOtv Max", price: 4150, value: "max" }
+        ],
+        startimes: [
+            { name: "Nova", price: 900, value: "nova" },
+            { name: "Basic", price: 1700, value: "basic" },
+            { name: "Smart", price: 2200, value: "smart" },
+            { name: "Classic", price: 2500, value: "classic" }
+        ]
     }
 };
 
@@ -222,18 +249,6 @@ app.post('/purchase', async (req, res) => {
         transaction,
         updatedBalance: user.wallet.balances
     });
-});
-
-// Fetch user data
-app.get('/user/:userId', (req, res) => {
-    const { userId } = req.params;
-
-    const user = users[userId];
-    if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json(user);
 });
 
 // Fetch transaction history
